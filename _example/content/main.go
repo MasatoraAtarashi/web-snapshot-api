@@ -9,21 +9,25 @@ import (
 
 func main() {
 	cid := flag.String("content-id", "", "content id")
-	token := flag.String("access-token", "", "access-token")
-	client := flag.String("client", "", "client")
-	uid := flag.String("uid", "", "uid")
+	email := flag.String("email", "", "email")
+	password := flag.String("password", "", "password")
 	flag.Parse()
+
+	c := ws.NewClient()
+	auth := ws.AuthParams{
+		EMail:    *email,
+		PassWord: *password,
+	}
+	c.AuthService.SignIn(context.Background(), &auth)
 
 	content := ws.Content{
 		ID:         *cid,
 		PDFPageNum: 5,
 	}
-
-	c := ws.NewClient(*token, *client, *uid)
 	contentResp, err := c.ContentService.Update(context.Background(), &content)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Printf("pdf_page_num: %d", contentResp.Content.PDFPageNum)
+	fmt.Printf("pdf_page_num: %d\n", contentResp.Content.PDFPageNum)
 }
