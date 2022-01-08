@@ -17,20 +17,17 @@ const (
 
 type Client struct {
 	ContentService ContentService
+	AuthService    AuthService
 
-	HTTPClient  *http.Client
-	AccessToken string
-	Client      string
-	UID         string
-	BaseURL     string
+	HTTPClient *http.Client
+	AuthHeader *AuthHeader
+	BaseURL    string
 }
 
-func NewClient(accessToken string, client string, uid string) *Client {
+func NewClient() *Client {
 	var cli Client
 	cli.ContentService = &contentService{cli: &cli}
-	cli.AccessToken = accessToken
-	cli.Client = client
-	cli.UID = uid
+	cli.AuthService = &authService{cli: &cli}
 	cli.BaseURL = baseURL + apiVersion
 	return &cli
 }
@@ -44,9 +41,12 @@ func (cli *Client) httpClient() *http.Client {
 
 func (cli *Client) do(ctx context.Context, req *http.Request) (*http.Response, error) {
 	req = req.WithContext(ctx)
-	req.Header.Set("access-token", cli.AccessToken)
-	req.Header.Set("client", cli.Client)
-	req.Header.Set("uid", cli.UID)
+	if cli.AuthHeader == nil {
+		return nil, fmt.Errorf("AuthHeader is nil")
+	}
+	req.Header.Set("access-token", cli.AuthHeader.AccessToken)
+	req.Header.Set("client", cli.AuthHeader.Client)
+	req.Header.Set("uid", cli.AuthHeader.UID)
 	return cli.httpClient().Do(req)
 }
 
