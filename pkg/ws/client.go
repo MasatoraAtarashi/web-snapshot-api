@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	baseURL    = "https://web-shiori.herokuapp.com"
+	baseURL    = "https://web-shiori.herokuapp.com/"
 	apiVersion = "v1"
 )
 
